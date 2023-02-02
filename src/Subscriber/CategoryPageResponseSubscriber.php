@@ -30,6 +30,7 @@ class CategoryPageResponseSubscriber implements EventSubscriberInterface
     private SearchAdapter $searchAdapter;
     private Engine $mustache;
     private CategoryPath $categoryPath;
+    private string $pageUrlParam;
 
     public function __construct(
         bool $httpCacheEnabled,
@@ -37,7 +38,8 @@ class CategoryPageResponseSubscriber implements EventSubscriberInterface
         Communication $config,
         SearchAdapter $searchAdapter,
         Engine $mustache,
-        CategoryPath $categoryPath
+        CategoryPath $categoryPath,
+        string $pageUrlParam
     ) {
         $this->httpCacheEnabled       = $httpCacheEnabled;
         $this->categoryRepository     = $categoryRepository;
@@ -45,6 +47,7 @@ class CategoryPageResponseSubscriber implements EventSubscriberInterface
         $this->searchAdapter          = $searchAdapter;
         $this->mustache               = $mustache;
         $this->categoryPath           = $categoryPath;
+        $this->pageUrlParam           = $pageUrlParam;
     }
 
     public static function getSubscribedEvents()
@@ -75,6 +78,7 @@ class CategoryPageResponseSubscriber implements EventSubscriberInterface
             $this->searchAdapter,
             $request->attributes->get('sw-sales-channel-id'),
             $response->getContent(),
+            $this->pageUrlParam
         );
 
         try {
