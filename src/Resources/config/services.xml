@@ -78,6 +78,7 @@
             <bind key="$entryRepository" type="service" id="factfinder_feed_preprocessor.repository" />
             <bind key="$cache" type="service" id="cache.object" />
             <bind key="$factfinderLogger" type="service" id="monolog.logger.factfinder_channel" />
+            <bind key="$templateFinder" type="service" id="Shopware\Core\Framework\Adapter\Twig\TemplateFinder" />
             <bind key="$pageUrlParam">%factfinder.ssr.parameters.page_url_param%</bind>
         </defaults>
 
