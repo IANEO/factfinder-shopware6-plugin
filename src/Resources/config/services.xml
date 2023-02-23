@@ -79,6 +79,7 @@
             <bind key="$twig" type="service" id="twig" />
             <bind key="$templateFinder" type="service" id="Shopware\Core\Framework\Adapter\Twig\TemplateFinder" />
             <bind key="$pageUrlParam">%factfinder.ssr.parameters.page_url_param%</bind>
+            <bind key="$cache" type="service" id="cache.object" />
         </defaults>
 
         <service id="Omikron\FactFinder\Shopware6\Communication\AdapterFactory" />
@@ -186,5 +187,7 @@
             <argument type="service" id="Omikron\FactFinder\Shopware6\Utilites\Ssr\Template\Filter"/>
         </service>
         <service id="Omikron\FactFinder\Shopware6\Utilites\Ssr\Template\Engine" />
+        <service id="Omikron\FactFinder\Shopware6\Config\FieldRolesInterface"
+                 alias="Omikron\FactFinder\Shopware6\Config\FieldRoles" />
     </services>
 </container>
