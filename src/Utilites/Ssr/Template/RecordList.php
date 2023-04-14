@@ -76,7 +76,7 @@ class RecordList
     ): array {
         if ($this->pageUrlParam !== 'page') {
             $paramString = strpos($paramString, $this->pageUrlParam . '=') === 0
-                ? sprintf('page=%s', substr($paramString, strlen($this->pageUrlParam)+1))
+                ? sprintf('page=%s', substr($paramString, strlen($this->pageUrlParam) + 1))
                 : str_replace('&' . $this->pageUrlParam . '=', '&page=', $paramString);
         }
 
@@ -131,18 +131,18 @@ class RecordList
     private function setPaging(array $results): void
     {
         $currentPage = (int) ($results['paging']['currentPage'] ?? 1);
-        $pageCount = (int) ($results['paging']['pageCount'] ?? 1);
+        $pageCount   = (int) ($results['paging']['pageCount'] ?? 1);
 
         $twigVars = [
             'currentPage' => $currentPage,
-            'pageCount' => $pageCount,
+            'pageCount'   => $pageCount,
         ];
         for ($page = 1; $page <= $pageCount; $page++) {
             $twigVars['pages'][$page] = $this->paginationUrl($page);
         }
 
         $template = $this->templateFinder->find('@Storefront/storefront/components/factfinder/ssr-paging.html.twig');
-        $paging = $this->twig->render($template, $twigVars);
+        $paging   = $this->twig->render($template, $twigVars);
 
         $this->content = preg_replace(self::SSR_PAGING_PATTERN, $paging, $this->content);
     }
