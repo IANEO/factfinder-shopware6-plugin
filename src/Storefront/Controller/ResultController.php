@@ -8,7 +8,6 @@ use Omikron\FactFinder\Shopware6\Config\Communication;
 use Omikron\FactFinder\Shopware6\Utilites\Ssr\SearchAdapter;
 use Omikron\FactFinder\Shopware6\Utilites\Ssr\Template\Engine;
 use Omikron\FactFinder\Shopware6\Utilites\Ssr\Template\RecordList;
-use Shopware\Core\Framework\Routing\Annotation\RouteScope;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;
 use Shopware\Storefront\Page\GenericPageLoader;
@@ -17,7 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * @RouteScope(scopes={"storefront"})
+ * @Route(defaults={"_routeScope"={"storefront"}})
  */
 class ResultController extends StorefrontController
 {
@@ -59,10 +58,30 @@ class ResultController extends StorefrontController
         );
         $response->setContent(
             $recordList->getContent(
-                (string) parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_QUERY)
+                $this->parseQueryString((string) parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_QUERY))
             )
         );
 
         return $response;
+    }
+
+    private function parseQueryString(string $queryString): string
+    {
+        if ($queryString === '') {
+            return '';
+        }
+
+        $queryParams = explode('&', $queryString);
+        $result      = array_reduce(
+            $queryParams,
+            function (string $carry, string $queryParam) {
+                $result = explode('=', $queryParam);
+
+                return sprintf('%s&%s=%s', $carry, $result[0], htmlspecialchars($result[1]));
+            },
+            ''
+        );
+
+        return substr($result, 1);
     }
 }

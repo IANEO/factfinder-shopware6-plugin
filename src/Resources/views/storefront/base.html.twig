@@ -3,9 +3,10 @@
 {% block base_body_inner %}
   {% block base_body_inner_factfinder_communication %}
     <ff-communication
-      {{ page.extensions.factfinder.communication|default([])|filter(val => val)|map((val, key) => key ~ '="' ~ (val|e('html_attr')) ~ '"')|join(' ')|raw }}
+      {{ page.extensions.factfinder.communicationAttributes|join(' ')|raw }}
       only-search-params="true"
-      disable-single-hit-redirect="true"></ff-communication>
+      disable-single-hit-redirect="true">
+    </ff-communication>
   {% endblock %}
 
   {{ parent() }}
@@ -14,7 +15,18 @@
 {% block base_body_script %}
   {% block base_script_factfinder_search_redirect %}
     <script>
+      const ffRedirectMapping = JSON.parse('{{ page.extensions.factfinder.redirectMapping|raw }}');
+
       document.addEventListener('before-search', function (event) {
+        const query = event.detail.query;
+
+        if (ffRedirectMapping.hasOwnProperty(query)) {
+          event.preventDefault();
+          window.location = ffRedirectMapping[query];
+
+          return;
+        }
+
         if (['productDetail', 'getRecords'].lastIndexOf(event.detail.type) === -1) {
           event.preventDefault();
           window.location = '{{ path('frontend.factfinder.result') }}' + factfinder.common.dictToParameterString(factfinder.common.encodeDict(event.detail));
@@ -23,7 +35,7 @@
 
       document.addEventListener('ffReady', function (e) {
         e.eventAggregator.addBeforeHistoryPushCallback(function (res, event, url) {
-          url = url.replace(/filter=CategoryPath[^&]+&?/, '');
+          url = url.replace(/filter=CategoryPath[^&]+&?/, '').replace(/order=[^&]+&?/, '').replace(/name=[^&]+&?/g, '');
           factfinder.communication.Util.pushParameterToHistory(res, url, event);
           return false;
         });
@@ -37,8 +49,11 @@
     document.addEventListener('ffCommunicationReady', ({ factfinder, searchImmediate }) => {
       {% if page.extensions.factfinder.ssr == 'ssr' %}
         const searchResult = {FF_SEARCH_RESULT};
-        factfinder.communication.EventAggregator.currentSearchResult = searchResult;
-        factfinder.communication.ResultDispatcher.dispatchRaw(searchResult);
+
+        if (searchResult.hasOwnProperty('records')) {
+          factfinder.communication.EventAggregator.currentSearchResult = searchResult;
+          factfinder.communication.ResultDispatcher.dispatchRaw(searchResult);
+        }
       {% endif %}
 
       const cookies = document.cookie.split('; ').reduce((acc, cookie) => {

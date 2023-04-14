@@ -46,12 +46,8 @@ class Communication extends BaseConfig
         return (string) $this->config('apiVersion') ?? 'v4';
     }
 
-    public function getTrackingSettings(): array
+    public function isProxyEnabled(): bool
     {
-        return [
-            'addToCart' => [
-                'count' => (string) $this->config('trackingAddToCartCount') ?? 'count_as_one',
-            ],
-        ];
+        return (bool) $this->config('useProxy');
     }
 }

@@ -7,6 +7,8 @@ namespace spec\Omikron\FactFinder\Shopware6\Subscriber;
 use Exception;
 use Omikron\FactFinder\Communication\Version;
 use Omikron\FactFinder\Shopware6\Config\Communication;
+use Omikron\FactFinder\Shopware6\Config\ExtensionConfig;
+use Omikron\FactFinder\Shopware6\Domain\RedirectMapping;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use Prophecy\Argument\Token\LogicalAndToken;
@@ -21,25 +23,30 @@ use Shopware\Storefront\Event\StorefrontRenderEvent;
 use Shopware\Storefront\Page\GenericPageLoadedEvent;
 use Shopware\Storefront\Page\Page;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\RouterInterface;
 
 class ConfigurationSubscriberSpec extends ObjectBehavior
 {
-    function let(Communication $communication)
-    {
+    public function let(
+        Communication $communication,
+        ExtensionConfig $extensionConfig,
+        RouterInterface $router
+    ) {
         $fieldRoles              = [];
         $communicationParameters = [];
         $communication->getServerUrl()->willReturn('https://factfinder.server.com');
-        $communication->getTrackingSettings()->willReturn(
+        $extensionConfig->getTrackingSettings()->willReturn(
             [
                 'addToCart' => [
                     'count' => 'count_as_one',
                 ],
             ]
         );
-        $this->beConstructedWith($communication, $fieldRoles, $communicationParameters);
+        $extensionConfig->getRedirectMapping()->willReturn(new RedirectMapping(''));
+        $this->beConstructedWith($communication, $extensionConfig, $router, $fieldRoles, $communicationParameters);
     }
 
-    function it_will_return_factfinderchannel_for_specific_sales_channel_id(
+    public function it_will_return_factfinderchannel_for_specific_sales_channel_id(
         Communication          $communication,
         GenericPageLoadedEvent $event,
         SalesChannelContext    $salesChannelContext,
@@ -59,6 +66,7 @@ class ConfigurationSubscriberSpec extends ObjectBehavior
         $communication->getVersion()->willReturn(Version::NG);
         $communication->getApiVersion()->willReturn('v5');
         $communication->isSsrActive()->willReturn(false);
+        $communication->isProxyEnabled()->willReturn(false);
         $communication->getChannel('main_sales_channel')->willReturn('some_ff_channel');
         $communication->getFieldRoles(Argument::any())->willReturn([]);
         $event->getRequest()->willReturn($request);
@@ -80,7 +88,7 @@ class ConfigurationSubscriberSpec extends ObjectBehavior
         $this->onPageLoaded($event);
     }
 
-    function it_will_add_page_extension_for_storefront_render_event(
+    public function it_will_add_page_extension_for_storefront_render_event(
         Communication          $communication,
         StorefrontRenderEvent  $event,
         SalesChannelContext    $salesChannelContext,
@@ -103,6 +111,7 @@ class ConfigurationSubscriberSpec extends ObjectBehavior
         $communication->getVersion()->willReturn(Version::NG);
         $communication->getApiVersion()->willReturn('v5');
         $communication->isSsrActive()->willReturn(false);
+        $communication->isProxyEnabled()->willReturn(false);
         $event->getRequest()->willReturn($request);
         $request->get('_route', Argument::any())->willReturn('factfinder');
         $request->getLocale()->willReturn('en');
@@ -122,7 +131,7 @@ class ConfigurationSubscriberSpec extends ObjectBehavior
         $this->onPageLoaded($event);
     }
 
-    function it_will_throw_exception_when_event_does_not_have_page(
+    public function it_will_throw_exception_when_event_does_not_have_page(
         Communication          $communication,
         StorefrontRenderEvent  $event,
         SalesChannelContext    $salesChannelContext,
@@ -143,6 +152,7 @@ class ConfigurationSubscriberSpec extends ObjectBehavior
         $communication->getVersion()->willReturn(Version::NG);
         $communication->getApiVersion()->willReturn('v5');
         $communication->isSsrActive()->willReturn(false);
+        $communication->isProxyEnabled()->willReturn(false);
         $event->getRequest()->willReturn($request);
         $request->get('_route', Argument::any())->willReturn('factfinder');
         $request->getLocale()->willReturn('en');

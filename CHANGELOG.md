@@ -1,4 +1,40 @@
 # Changelog
+## [v4.2.3] - 2023.04.13
+### Fix
+- SSR
+  - Cache field roles
+- Fix problem with new map due to SecurityExtension
+- Export
+  - Fix problem with PriceCurrency during export
+- Security patch
+
+## [v4.2.2] - 2023.03.16
+### Add
+- Proxy
+### Change
+- Upgrade Web Components version to v4.2.6
+### Fix
+- Tracking
+  - Fix tracking when `Add To Cart` button has been clicked
+
+## [v4.2.1] - 2023.03.10
+### Fix
+- Category
+  - Fix sorting - removed redundant parameters `order` and `name`
+### Change
+- Upgrade Web Components version to v4.2.5
+
+## [v4.2.0] - 2023.02.23
+### Fix
+- SSR
+  - fixed problem with not visible search results when SSR enabled
+### Change
+- Upgrade Web Components version to v4.2.4
+- Export
+  - Export only active categories
+### Add
+- Redirect mapping for selected queries
+
 ## [v4.1.2] - 2023.02.06
 ### Fix
 - Category
@@ -317,6 +353,10 @@
 ## [v1.0.0] - 2021.06.29
 Initial module release. Includes Web Components v4.0.3
 
+[v4.2.3]: https://github.com/FACT-Finder-Web-Components/shopware6-plugin/releases/tag/v4.2.3
+[v4.2.2]: https://github.com/FACT-Finder-Web-Components/shopware6-plugin/releases/tag/v4.2.2
+[v4.2.1]: https://github.com/FACT-Finder-Web-Components/shopware6-plugin/releases/tag/v4.2.1
+[v4.2.0]: https://github.com/FACT-Finder-Web-Components/shopware6-plugin/releases/tag/v4.2.0
 [v4.1.2]: https://github.com/FACT-Finder-Web-Components/shopware6-plugin/releases/tag/v4.1.2
 [v4.1.1]: https://github.com/FACT-Finder-Web-Components/shopware6-plugin/releases/tag/v4.1.1
 [v4.1.0]: https://github.com/FACT-Finder-Web-Components/shopware6-plugin/releases/tag/v4.1.0
