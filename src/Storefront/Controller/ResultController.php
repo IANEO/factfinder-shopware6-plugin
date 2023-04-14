@@ -9,6 +9,7 @@ use Omikron\FactFinder\Shopware6\Utilites\Ssr\Exception\DetectRedirectCampaignEx
 use Omikron\FactFinder\Shopware6\Utilites\Ssr\SearchAdapter;
 use Omikron\FactFinder\Shopware6\Utilites\Ssr\Template\Engine;
 use Omikron\FactFinder\Shopware6\Utilites\Ssr\Template\RecordList;
+use Shopware\Core\Framework\Adapter\Twig\TemplateFinderInterface;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;
 use Shopware\Storefront\Page\GenericPageLoader;
@@ -16,6 +17,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Twig\Environment;
 
 /**
  * @Route(defaults={"_routeScope"={"storefront"}})
@@ -42,7 +44,10 @@ class ResultController extends StorefrontController
         Request $request,
         SalesChannelContext $context,
         SearchAdapter $searchAdapter,
-        Engine $mustache
+        Environment $twig,
+        TemplateFinderInterface $templateFinder,
+        Engine $mustache,
+        string $pageUrlParam
     ): Response {
         $page     = $this->pageLoader->load($request, $context);
         $response = $this->renderStorefront('@Parent/storefront/page/factfinder/result.html.twig', ['page' => $page]);
@@ -53,10 +58,13 @@ class ResultController extends StorefrontController
 
         $recordList = new RecordList(
             $request,
+            $twig,
+            $templateFinder,
             $mustache,
             $searchAdapter,
             $context->getSalesChannelId(),
             $response->getContent(),
+            $pageUrlParam
         );
 
         try {
