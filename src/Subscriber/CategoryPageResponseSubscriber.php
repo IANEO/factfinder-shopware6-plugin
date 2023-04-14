@@ -38,7 +38,7 @@ class CategoryPageResponseSubscriber implements EventSubscriberInterface
         $this->categoryRepository = $categoryRepository;
         $this->config             = $config;
         $this->searchAdapter      = $searchAdapter;
-        $this->mustache               = $mustache;
+        $this->mustache           = $mustache;
         $this->categoryPath       = $categoryPath;
     }
 
@@ -72,7 +72,7 @@ class CategoryPageResponseSubscriber implements EventSubscriberInterface
             $response->getContent(),
         );
         $paramsString = $categoryPath;
-        $params = (string) parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_QUERY);
+        $params       = (string) parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_QUERY);
 
         if ($params !== '') {
             if (strpos($params, 'p=') === 0) {
@@ -112,9 +112,9 @@ class CategoryPageResponseSubscriber implements EventSubscriberInterface
 
     private function getCategoryId(Request $request): string
     {
-        $uri = $request->attributes->get('resolved-uri');
+        $uri   = $request->attributes->get('resolved-uri');
         $start = '/navigation/';
-        $pos = strpos($uri ?? '', $start);
+        $pos   = strpos($uri ?? '', $start);
 
         if ($pos !== 0) {
             return '';
