@@ -9,6 +9,7 @@ use Omikron\FactFinder\Shopware6\Utilites\Ssr\Field\CategoryPath;
 use Omikron\FactFinder\Shopware6\Utilites\Ssr\SearchAdapter;
 use Omikron\FactFinder\Shopware6\Utilites\Ssr\Template\Engine;
 use Omikron\FactFinder\Shopware6\Utilites\Ssr\Template\RecordList;
+use Shopware\Core\Framework\Adapter\Twig\TemplateFinderInterface;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepositoryInterface;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -16,6 +17,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Event\BeforeSendResponseEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Twig\Environment;
 
 class CategoryPageResponseSubscriber implements EventSubscriberInterface
 {
@@ -23,23 +25,32 @@ class CategoryPageResponseSubscriber implements EventSubscriberInterface
     private EntityRepositoryInterface $categoryRepository;
     private Communication $config;
     private SearchAdapter $searchAdapter;
+    private Environment $twig;
+    private TemplateFinderInterface $templateFinder;
     private Engine $mustache;
     private CategoryPath $categoryPath;
+    private string $pageUrlParam;
 
     public function __construct(
         bool $httpCacheEnabled,
         EntityRepositoryInterface $categoryRepository,
         Communication $config,
         SearchAdapter $searchAdapter,
+        Environment $twig,
+        TemplateFinderInterface $templateFinder,
         Engine $mustache,
-        CategoryPath $categoryPath
+        CategoryPath $categoryPath,
+        string $pageUrlParam
     ) {
         $this->httpCacheEnabled       = $httpCacheEnabled;
         $this->categoryRepository     = $categoryRepository;
         $this->config                 = $config;
         $this->searchAdapter          = $searchAdapter;
+        $this->twig                   = $twig;
+        $this->templateFinder         = $templateFinder;
         $this->mustache               = $mustache;
         $this->categoryPath           = $categoryPath;
+        $this->pageUrlParam           = $pageUrlParam;
     }
 
     public static function getSubscribedEvents()
@@ -66,10 +77,13 @@ class CategoryPageResponseSubscriber implements EventSubscriberInterface
 
         $recordList = new RecordList(
             $request,
+            $this->twig,
+            $this->templateFinder,
             $this->mustache,
             $this->searchAdapter,
             $request->attributes->get('sw-sales-channel-id'),
             $response->getContent(),
+            $this->pageUrlParam
         );
         $response->setContent(
             $recordList->getContent(
