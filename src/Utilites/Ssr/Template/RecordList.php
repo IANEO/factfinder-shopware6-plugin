@@ -53,14 +53,32 @@ class RecordList
     public function getContent(
         string $paramString,
         bool $isNavigationRequest = false
-    ) {
+    ): string {
+        $results = $this->searchResults($paramString, $isNavigationRequest);
+
+        return $this->renderResults($results, $paramString);
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
+     */
+    public function searchResults(
+        string $paramString,
+        bool $isNavigationRequest = false
+    ): array {
         if ($this->pageUrlParam !== 'page') {
             $paramString = strpos($paramString, $this->pageUrlParam . '=') === 0
                 ? sprintf('page=%s', substr($paramString, strlen($this->pageUrlParam) + 1))
                 : str_replace('&' . $this->pageUrlParam . '=', '&page=', $paramString);
         }
 
-        $results        = $this->searchAdapter->search($paramString, $isNavigationRequest, $this->salesChannelId);
+        return $this->searchAdapter->search($paramString, $isNavigationRequest, $this->salesChannelId);
+    }
+
+    public function renderResults(
+        array $results,
+        string $paramString
+    ): string {
         $records        = $results['records'] ?? [];
         $recordsContent = array_reduce(
             $records,
