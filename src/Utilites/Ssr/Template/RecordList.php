@@ -108,7 +108,7 @@ class RecordList
         $this->setPaging($results);
 
         if ($records === []) {
-            return $this->content;
+            return preg_replace(self::SSR_RECORD_PATTERN, '', $this->content);
         }
 
         return preg_replace(self::SSR_RECORD_PATTERN, $recordsContent, $this->content);
